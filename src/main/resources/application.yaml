@@ -15,3 +15,8 @@ spring:
         options:
           model: deepseek-r1
           stream-usage: true
+
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor: debug
+    cloud.ciky: debug

@@ -1,6 +1,7 @@
 package cloud.ciky.config;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,7 @@ public class CommonConfiguration {
     public ChatClient chatClient(OpenAiChatModel model){
         return ChatClient
                 .builder(model) //创建chatClient工厂
+                .defaultAdvisors(new SimpleLoggerAdvisor()) // 添加默认的Advisor,记录日志
                 .build();       //构建ChatClient实例
     }
 
