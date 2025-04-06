@@ -19,6 +19,7 @@ public class CommonConfiguration {
     public ChatClient chatClient(OllamaChatModel model) {
         return ChatClient
                 .builder(model) //创建chatClient工厂
+                .defaultSystem("你是一个智能助手,你的名字叫Ciky")
                 .build();       //构建ChatClient实例
     }
 
