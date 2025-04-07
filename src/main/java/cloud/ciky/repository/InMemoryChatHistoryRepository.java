@@ -1,5 +1,7 @@
 package cloud.ciky.repository;
 
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.Map;
  * @Description: 会话历史存储实现类 (内存存储)
  * @DateTime: 2025/4/7 20:21
  **/
+@Component
 public class InMemoryChatHistoryRepository implements ChatHistoryRepository{
 
     private final Map<String,List<String>> chatHistory = new HashMap<>();
