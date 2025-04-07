@@ -2,6 +2,7 @@ package cloud.ciky.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,9 +22,11 @@ public class ChatController {
     private final ChatClient chatClient;
 
     @RequestMapping(value = "/chat",produces = "text/html;charset=utf-8")
-    public Flux<String> chat(@RequestParam("prompt") String prompt){
+    public Flux<String> chat(@RequestParam("prompt") String prompt,@RequestParam("chatId") String chatId){
         return chatClient.prompt()
                 .user(prompt)   //传入user提示词
+                .advisors(advisorSpec ->
+                        advisorSpec.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY,chatId))   //添加会话id到AdvisorContext
                 .stream() //流式调用
                 .content();
     }
