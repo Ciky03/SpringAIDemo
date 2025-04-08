@@ -10,11 +10,11 @@ spring:
     # 配置openAI
     openai:
       base-url: https://dashscope.aliyuncs.com/compatible-mode
-      api-key: sk-b524350c94c644bdaba8a8c70f2aa358
+      api-key: ${OPENAI_API_KEY}
       chat:
         options:
-          model: deepseek-r1
-          stream-usage: true
+          model: qwen-max-latest
+#          stream-usage: true
 
 logging:
   level:
