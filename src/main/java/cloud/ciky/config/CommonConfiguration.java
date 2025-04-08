@@ -1,6 +1,7 @@
 package cloud.ciky.config;
 
 import cloud.ciky.constants.SystemConstants;
+import cloud.ciky.tools.CourseTools;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
@@ -58,6 +59,19 @@ public class CommonConfiguration {
                         new SimpleLoggerAdvisor(),                  //添加默认的Advisor记录日志
                         new MessageChatMemoryAdvisor(chatMemory)    //添加默认的Advisor会话记忆
                 )
+                .build();       //构建ChatClient实例
+    }
+
+    @Bean
+    public ChatClient serviceChatClient(OpenAiChatModel model, ChatMemory chatMemory, CourseTools courseTools){
+        return ChatClient
+                .builder(model) //创建chatClient工厂
+                .defaultSystem(SystemConstants.SERVICE_SYSTEM_PROMPT)   //系统提示词
+                .defaultAdvisors(
+                        new SimpleLoggerAdvisor(),                      //添加默认的Advisor记录日志
+                        new MessageChatMemoryAdvisor(chatMemory)        //添加默认的Advisor会话记忆
+                )
+                .defaultTools(courseTools)  //添加Tools
                 .build();       //构建ChatClient实例
     }
 }
