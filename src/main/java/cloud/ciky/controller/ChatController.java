@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,15 +16,18 @@ import reactor.core.publisher.Flux;
  * @Description: chat接口
  * @DateTime: 2025/4/6 14:37
  **/
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @RestController
 @RequestMapping("/ai")
 public class ChatController {
 
     //使用lombok自动生成构造方法注入
-    private final ChatClient chatClient;
+    @Autowired
+    @Qualifier("chatClient")
+    private  ChatClient chatClient;
 
-    private final ChatHistoryRepository chatHistoryRepository;
+    @Autowired
+    private  ChatHistoryRepository chatHistoryRepository;
 
     @RequestMapping(value = "/chat",produces = "text/html;charset=utf-8")
     public Flux<String> chat(@RequestParam("prompt") String prompt,@RequestParam("chatId") String chatId){
