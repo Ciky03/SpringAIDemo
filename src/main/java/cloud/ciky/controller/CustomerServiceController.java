@@ -31,7 +31,7 @@ public class CustomerServiceController {
     }
 
     @RequestMapping(value = "/service",produces = "text/html;charset=utf-8")
-    public String chat(@RequestParam("prompt") String prompt, @RequestParam("chatId") String chatId) {
+    public Flux<String> chat(@RequestParam("prompt") String prompt, @RequestParam("chatId") String chatId) {
         //1.保存会话ID
         chatHistoryRepository.save("service",chatId);
         //2.请求模型
@@ -39,7 +39,7 @@ public class CustomerServiceController {
                 .user(prompt)   //传入user提示词
                 .advisors(advisorSpec ->
                         advisorSpec.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY,chatId))   //添加会话id到AdvisorContext
-                .call()
+                .stream()
                 .content();
     }
 }
