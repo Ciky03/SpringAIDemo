@@ -16,7 +16,10 @@ import org.springframework.ai.model.SimpleApiKey;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,6 +56,11 @@ public class CommonConfiguration {
     @Bean
     public ChatMemory chatMemory(){
         return new InMemoryChatMemory();
+    }
+
+    @Bean
+    public VectorStore vectorStore(OpenAiEmbeddingModel embeddingModel){
+        return SimpleVectorStore.builder(embeddingModel).build();
     }
 
 
