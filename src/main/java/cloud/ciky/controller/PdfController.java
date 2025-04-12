@@ -10,13 +10,13 @@ import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.core.io.Resource;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.rmi.server.RemoteServer;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Objects;
 
@@ -61,6 +61,34 @@ public class PdfController {
         }
     }
 
+    /**
+     * 文件下载
+     */
+    @GetMapping("/file/{chatId}")
+    public ResponseEntity<Resource> downloadPdf(@PathVariable String chatId) throws IOException {
+        //1.读取文件
+        Resource resource = fileRepository.getFile(chatId);
+        if(!resource.exists()){
+            return ResponseEntity.notFound().build();
+        }
+
+        //2.文件名编码,写入响应头
+        String filename = URLEncoder.encode(Objects.requireNonNull(resource.getFilename()), "UTF-8");
+
+        //3.返回文件
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header("Content-Disposition","attachment; filename=\""+filename+"\"")
+                .body(resource);
+        /*
+        *  APPLICATION_OCTET_STREAM:表示这是一个二进制流文件
+        *  Content-Disposition: attachment; [filename=value]
+        *  attachment:表示下载文件 (inline:表示在浏览器中打开)
+        *  filename=value:表示下载的文件名
+        */
+    }
+
+
 
     /** 提取方法: 写入向量库  */
     private void writeToVectorStore(Resource resource){
@@ -77,14 +105,4 @@ public class PdfController {
         //3.写入向量库
         vectorStore.add(documents);
     }
-
-
-
-
-
-
-
-
-
-
 }
