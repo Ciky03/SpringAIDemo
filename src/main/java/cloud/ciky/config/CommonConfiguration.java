@@ -8,16 +8,19 @@ import org.springframework.ai.autoconfigure.openai.OpenAiChatProperties;
 import org.springframework.ai.autoconfigure.openai.OpenAiConnectionProperties;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.observation.ChatModelObservationConvention;
+import org.springframework.ai.model.Model;
 import org.springframework.ai.model.SimpleApiKey;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.ObjectProvider;
@@ -133,5 +136,24 @@ public class CommonConfiguration {
         Objects.requireNonNull(chatModel);
         observationConvention.ifAvailable(chatModel::setObservationConvention);
         return chatModel;
+    }
+
+    @Bean
+    public ChatClient pdfChatClient(OpenAiChatModel model, ChatMemory chatMemory,VectorStore vectorStore){
+        return ChatClient
+                .builder(model)     //创建chatClient工厂
+                .defaultSystem("请根据提供的上下文回答问题，不要自己猜测")  //系统提示词
+                .defaultAdvisors(
+                        new SimpleLoggerAdvisor(),                  //添加默认的Advisor记录日志
+                        new MessageChatMemoryAdvisor(chatMemory),    //添加默认的Advisor会话记忆
+                        new QuestionAnswerAdvisor(                  //添加问答Advisor
+                                vectorStore,        //向量库
+                                SearchRequest.builder()
+                                        .similarityThreshold(0.6d)  //相似度阈值
+                                        .topK(2)                    //返回数量
+                                        .build()
+                        )
+                )
+                .build();
     }
 }
