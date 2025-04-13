@@ -55,7 +55,7 @@ import java.util.Properties;
 
         //2.保存映射关系
         chatFiles.setProperty(chatId,filename);
-        return false;
+        return true;
     }
 
     /**
