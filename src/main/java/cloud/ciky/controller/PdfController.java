@@ -1,19 +1,26 @@
 package cloud.ciky.controller;
 
 import cloud.ciky.entity.vo.Result;
+import cloud.ciky.repository.ChatHistoryRepository;
 import cloud.ciky.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -34,6 +41,12 @@ public class PdfController {
     private final FileRepository fileRepository;
 
     private final VectorStore vectorStore;
+
+    private final ChatHistoryRepository chatHistoryRepository;
+
+    @Autowired
+    @Qualifier("pdfChatClient")
+    private  ChatClient pdfChatClient;
 
     /**
      * 上传文件
@@ -87,6 +100,26 @@ public class PdfController {
         *  filename=value:表示下载的文件名
         */
     }
+
+    @RequestMapping(value = "/chat",produces = "text/html;charset=utf-8")
+    public Flux<String> chat(@RequestParam("prompt") String prompt, @RequestParam("chatId") String chatId){
+        //1.找到会话文件
+        Resource file = fileRepository.getFile(chatId);
+        if(!file.exists()){
+            //文件不存在,不会答
+            throw new RuntimeException("会话文件不存在");
+        }
+        //2.保存会话ID
+        chatHistoryRepository.save("pdf",chatId);
+        //3.请求模型
+        return pdfChatClient.prompt()
+                .user(prompt)   //传入user提示词
+                .advisors(a -> a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY,chatId))   //添加会话id到AdvisorContext
+                .advisors(a -> a.param(QuestionAnswerAdvisor.FILTER_EXPRESSION, "file_name == '"+ file.getFilename()+"'"))  //添加文件名过滤器
+                .stream()   //获取流式响应
+                .content();
+    }
+
 
 
 
