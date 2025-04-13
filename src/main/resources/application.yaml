@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 104857600
+      max-request-size: 104857600
   application:
     name: springAIDemo
   ai:
