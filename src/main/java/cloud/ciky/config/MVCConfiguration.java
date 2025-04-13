@@ -18,6 +18,7 @@ public class MVCConfiguration implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("*")
                 .allowedHeaders("*")
-                .allowedMethods("GET","POST","PUT","DELETE","OPTIONS");
+                .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
+                .exposedHeaders("Content-Disposition");
     }
 }
