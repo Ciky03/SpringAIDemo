@@ -78,7 +78,7 @@ public class PdfController {
      * 文件下载
      */
     @GetMapping("/file/{chatId}")
-    public ResponseEntity<Resource> downloadPdf(@PathVariable String chatId) throws IOException {
+    public ResponseEntity<Resource> downloadPdf(@PathVariable("chatId") String chatId) throws IOException {
         //1.读取文件
         Resource resource = fileRepository.getFile(chatId);
         if(!resource.exists()){
