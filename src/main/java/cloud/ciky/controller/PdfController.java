@@ -52,7 +52,7 @@ public class PdfController {
      * 上传文件
      */
     @RequestMapping("/upload/{chatId}")
-    public Result uploadPdf(@PathVariable String chatId, @RequestParam("file")MultipartFile file){
+    public Result uploadPdf(@PathVariable("chatId") String chatId, @RequestParam("file")MultipartFile file){
         try {
             //1.校验文件是否为PDF格式
             if(!Objects.equals(file.getContentType(),"application/pdf")){
