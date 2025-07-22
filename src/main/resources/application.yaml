@@ -6,6 +6,20 @@ spring:
   application:
     name: springAIDemo
   ai:
+#    # 向量数据库配置
+#    vectorstore:
+#      milvus:
+#        client:
+#          host: 192.168.12.70
+#          port: 19530
+#          username: root
+#          password: milvus
+#        collection-name: "default"      #集合名称
+#        database-name:  "vector_store"  #数据库名称
+#        embedding-dimension: 1536       #向量维度
+#        index-type: IVF_FLAT            #索引类型
+#        metric-type: cosine             #度量类型
+#        initialize-schema: true         #构建时初始化数据库模式
     # 配置ollama
     ollama:
       base-url: http://localhost:11434
@@ -14,16 +28,22 @@ spring:
     # 配置openAI
     openai:
       base-url: https://dashscope.aliyuncs.com/compatible-mode
-      api-key: ${OPENAI_API_KEY}
+      api-key: sk-b524350c94c644bdaba8a8c70f2aa358
       chat:
         options:
-          model: qwen-max-latest
+          model: qwen-plus
 #          stream-usage: true
       # 配置向量模型
       embedding:
         options:
           model: text-embedding-v3
           dimension: 1024 # 向量维度
+
+    dashscope:
+      api-key:  sk-b524350c94c644bdaba8a8c70f2aa358
+      chat:
+        options:
+          model: qwen-max-latest
 
   # 配置数据库
   datasource:
